@@ -1,0 +1,180 @@
+<%- include('../partials/header') %>
+
+<%
+  const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+%>
+
+<h1 class="page-title">Laporan - <%= namaBulan[bulan-1] %> <%= tahun %></h1>
+
+<div class="filter-bar">
+  <form method="GET" action="/laporan" class="filter-form">
+    <select name="bulan" class="input">
+      <% for (let i = 1; i <= 12; i++) { %>
+        <option value="<%= i %>" <%= i === bulan ? 'selected' : '' %>><%= namaBulan[i-1] %></option>
+      <% } %>
+    </select>
+    <select name="tahun" class="input">
+      <% for (let y = tahun - 2; y <= tahun + 1; y++) { %>
+        <option value="<%= y %>" <%= y === tahun ? 'selected' : '' %>><%= y %></option>
+      <% } %>
+    </select>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+  </form>
+</div>
+
+<div class="cards-row">
+  <div class="card">
+    <div class="card-label">Total Pemasukan</div>
+    <div class="card-value text-green">Rp <%= totalMasuk.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Total Pengeluaran</div>
+    <div class="card-value text-red">Rp <%= totalKeluar.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card card-highlight">
+    <div class="card-label">Selisih</div>
+    <div class="card-value <%= selisih >= 0 ? 'text-green' : 'text-red' %>">
+      Rp <%= selisih.toLocaleString('id-ID') %>
+    </div>
+  </div>
+</div>
+
+<% if (pengeluaranKategori.length > 0 || pemasukanKategori.length > 0) { %>
+<div class="charts-row">
+  <div class="chart-container">
+    <h3>Pengeluaran per Kategori</h3>
+    <canvas id="pieChart"></canvas>
+  </div>
+  <div class="chart-container">
+    <h3>Tren Harian</h3>
+    <canvas id="barChart"></canvas>
+  </div>
+</div>
+
+<!-- Tabel breakdown pengeluaran -->
+<% if (pengeluaranKategori.length > 0) { %>
+<h3 class="section-title">Detail Pengeluaran</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Kategori</th>
+      <th class="text-right">Jumlah</th>
+      <th class="text-right">Persentase</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% pengeluaranKategori.forEach(k => { %>
+    <tr>
+      <td><%= k.ikon %> <%= k.nama %></td>
+      <td class="text-right text-red">Rp <%= parseFloat(k.total).toLocaleString('id-ID') %></td>
+      <td class="text-right"><%= totalKeluar > 0 ? Math.round(parseFloat(k.total) / totalKeluar * 100) : 0 %>%</td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<% } %>
+
+<!-- Tabel breakdown pemasukan -->
+<% if (pemasukanKategori.length > 0) { %>
+<h3 class="section-title">Detail Pemasukan</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Kategori</th>
+      <th class="text-right">Jumlah</th>
+      <th class="text-right">Persentase</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% pemasukanKategori.forEach(k => { %>
+    <tr>
+      <td><%= k.ikon %> <%= k.nama %></td>
+      <td class="text-right text-green">Rp <%= parseFloat(k.total).toLocaleString('id-ID') %></td>
+      <td class="text-right"><%= totalMasuk > 0 ? Math.round(parseFloat(k.total) / totalMasuk * 100) : 0 %>%</td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<% } %>
+
+<% } else { %>
+  <div class="empty-state">Tidak ada data transaksi di bulan ini.</div>
+<% } %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Data dari server
+  const pengeluaranData = <%- JSON.stringify(pengeluaranKategori.map(k => ({ nama: k.nama, total: parseFloat(k.total) }))) %>;
+  const trenData = <%- JSON.stringify(trenHarian.map(h => ({ hari: h.hari, masuk: parseFloat(h.masuk), keluar: parseFloat(h.keluar) }))) %>;
+
+  const chartColors = [
+    '#00e676', '#00c853', '#69f0ae', '#b9f6ca',
+    '#00bfa5', '#1de9b6', '#64ffda', '#a7ffeb',
+    '#76ff03', '#ccff90', '#f4ff81', '#eeff41'
+  ];
+
+  // Pie Chart
+  if (pengeluaranData.length > 0) {
+    new Chart(document.getElementById('pieChart'), {
+      type: 'doughnut',
+      data: {
+        labels: pengeluaranData.map(d => d.nama),
+        datasets: [{
+          data: pengeluaranData.map(d => d.total),
+          backgroundColor: chartColors.slice(0, pengeluaranData.length),
+          borderColor: '#0d0d0d',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#e0e0e0', padding: 15, font: { size: 12 } }
+          }
+        }
+      }
+    });
+  }
+
+  // Bar Chart
+  if (trenData.length > 0) {
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: trenData.map(d => 'Tgl ' + d.hari),
+        datasets: [
+          {
+            label: 'Pemasukan',
+            data: trenData.map(d => d.masuk),
+            backgroundColor: '#00e67680',
+            borderColor: '#00e676',
+            borderWidth: 1
+          },
+          {
+            label: 'Pengeluaran',
+            data: trenData.map(d => d.keluar),
+            backgroundColor: '#ff525280',
+            borderColor: '#ff5252',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { ticks: { color: '#e0e0e0' }, grid: { color: '#2a2a2a' } },
+          y: { ticks: { color: '#e0e0e0' }, grid: { color: '#2a2a2a' } }
+        },
+        plugins: {
+          legend: {
+            labels: { color: '#e0e0e0' }
+          }
+        }
+      }
+    });
+  }
+</script>
+
+<%- include('../partials/footer') %>

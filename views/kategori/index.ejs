@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Kategori</h1>
+
+<div class="kategori-grid">
+  <!-- Pemasukan -->
+  <div class="kategori-section">
+    <h2 class="text-green">Pemasukan</h2>
+    <div class="kategori-list">
+      <% pemasukan.forEach(k => { %>
+      <div class="kategori-item">
+        <span class="kategori-icon"><%= k.ikon %></span>
+        <span class="kategori-nama"><%= k.nama %></span>
+        <form method="POST" action="/kategori/<%= k.id %>?_method=DELETE" class="inline-form"
+          onsubmit="return confirm('Hapus kategori <%= k.nama %>?')">
+          <button type="submit" class="btn btn-small btn-danger">Hapus</button>
+        </form>
+      </div>
+      <% }) %>
+    </div>
+    <form method="POST" action="/kategori" class="kategori-add-form">
+      <input type="hidden" name="tipe" value="pemasukan">
+      <input type="text" name="nama" class="input" placeholder="Nama kategori baru" required>
+      <input type="text" name="ikon" class="input input-small" placeholder="Ikon" value="📥">
+      <button type="submit" class="btn btn-primary">Tambah</button>
+    </form>
+  </div>
+
+  <!-- Pengeluaran -->
+  <div class="kategori-section">
+    <h2 class="text-red">Pengeluaran</h2>
+    <div class="kategori-list">
+      <% pengeluaran.forEach(k => { %>
+      <div class="kategori-item">
+        <span class="kategori-icon"><%= k.ikon %></span>
+        <span class="kategori-nama"><%= k.nama %></span>
+        <form method="POST" action="/kategori/<%= k.id %>?_method=DELETE" class="inline-form"
+          onsubmit="return confirm('Hapus kategori <%= k.nama %>?')">
+          <button type="submit" class="btn btn-small btn-danger">Hapus</button>
+        </form>
+      </div>
+      <% }) %>
+    </div>
+    <form method="POST" action="/kategori" class="kategori-add-form">
+      <input type="hidden" name="tipe" value="pengeluaran">
+      <input type="text" name="nama" class="input" placeholder="Nama kategori baru" required>
+      <input type="text" name="ikon" class="input input-small" placeholder="Ikon" value="📤">
+      <button type="submit" class="btn btn-primary">Tambah</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

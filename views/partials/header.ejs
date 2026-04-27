@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keuangan Keluarga</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">$</span>
+      <span class="brand-text">KeluargaKu</span>
+    </div>
+    <ul class="nav-list">
+      <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
+        <span class="nav-icon">&#9751;</span> Beranda
+      </a></li>
+      <li><a href="/transaksi" class="<%= currentPath.startsWith('/transaksi') ? 'active' : '' %>">
+        <span class="nav-icon">&#8644;</span> Transaksi
+      </a></li>
+      <li><a href="/kategori" class="<%= currentPath.startsWith('/kategori') ? 'active' : '' %>">
+        <span class="nav-icon">&#9783;</span> Kategori
+      </a></li>
+      <li><a href="/anggaran" class="<%= currentPath.startsWith('/anggaran') ? 'active' : '' %>">
+        <span class="nav-icon">&#9881;</span> Anggaran
+      </a></li>
+      <li><a href="/laporan" class="<%= currentPath.startsWith('/laporan') ? 'active' : '' %>">
+        <span class="nav-icon">&#9776;</span> Laporan
+      </a></li>
+    </ul>
+  </nav>
+  <main class="content">
+    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+      <div class="alert alert-success"><%= success %></div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>

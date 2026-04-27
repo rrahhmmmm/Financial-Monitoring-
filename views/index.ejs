@@ -1,0 +1,66 @@
+<%- include('partials/header') %>
+
+<h1 class="page-title">Beranda</h1>
+
+<div class="cards-row">
+  <div class="card card-highlight">
+    <div class="card-label">Saldo Total</div>
+    <div class="card-value <%= saldo >= 0 ? 'text-green' : 'text-red' %>">
+      Rp <span class="rupiah"><%= saldo.toLocaleString('id-ID') %></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Pemasukan Bulan Ini</div>
+    <div class="card-value text-green">
+      Rp <span class="rupiah"><%= bulanMasuk.toLocaleString('id-ID') %></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Pengeluaran Bulan Ini</div>
+    <div class="card-value text-red">
+      Rp <span class="rupiah"><%= bulanKeluar.toLocaleString('id-ID') %></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Selisih Bulan Ini</div>
+    <div class="card-value <%= bulanNet >= 0 ? 'text-green' : 'text-red' %>">
+      Rp <span class="rupiah"><%= bulanNet.toLocaleString('id-ID') %></span>
+    </div>
+  </div>
+</div>
+
+<div class="section-header">
+  <h2>Transaksi Terakhir</h2>
+  <a href="/transaksi/tambah" class="btn btn-primary">+ Tambah Transaksi</a>
+</div>
+
+<% if (transaksi.length === 0) { %>
+  <div class="empty-state">Belum ada transaksi. Mulai catat keuangan keluarga Anda!</div>
+<% } else { %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Kategori</th>
+      <th>Keterangan</th>
+      <th>Tipe</th>
+      <th class="text-right">Jumlah</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% transaksi.forEach(t => { %>
+    <tr>
+      <td><%= new Date(t.tanggal).toLocaleDateString('id-ID') %></td>
+      <td><%= t.ikon || '' %> <%= t.kategori_nama || '-' %></td>
+      <td><%= t.keterangan || '-' %></td>
+      <td><span class="badge badge-<%= t.tipe === 'pemasukan' ? 'green' : 'red' %>"><%= t.tipe %></span></td>
+      <td class="text-right <%= t.tipe === 'pemasukan' ? 'text-green' : 'text-red' %>">
+        Rp <%= parseFloat(t.jumlah).toLocaleString('id-ID') %>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<% } %>
+
+<%- include('partials/footer') %>

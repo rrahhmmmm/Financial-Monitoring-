@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+
+<%
+  const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+%>
+
+<h1 class="page-title">Atur Anggaran - <%= namaBulan[bulan-1] %> <%= tahun %></h1>
+
+<div class="form-container">
+  <form method="POST" action="/anggaran" class="form">
+    <input type="hidden" name="bulan" value="<%= bulan %>">
+    <input type="hidden" name="tahun" value="<%= tahun %>">
+
+    <p class="form-hint">Masukkan jumlah anggaran untuk setiap kategori pengeluaran. Isi 0 untuk menghapus anggaran.</p>
+
+    <% kategori.forEach(k => { %>
+    <div class="form-group form-group-inline">
+      <label><%= k.ikon %> <%= k.nama %></label>
+      <input type="number" name="anggaran[<%= k.id %>]" class="input" min="0" step="1000"
+        placeholder="0"
+        value="<%= anggaranMap[k.id] || 0 %>">
+    </div>
+    <% }) %>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Simpan Anggaran</button>
+      <a href="/anggaran?bulan=<%= bulan %>&tahun=<%= tahun %>" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

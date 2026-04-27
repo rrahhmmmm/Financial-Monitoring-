@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Anggaran Bulanan</h1>
+
+<div class="filter-bar">
+  <form method="GET" action="/anggaran" class="filter-form">
+    <select name="bulan" class="input">
+      <% const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; %>
+      <% for (let i = 1; i <= 12; i++) { %>
+        <option value="<%= i %>" <%= i === bulan ? 'selected' : '' %>><%= namaBulan[i-1] %></option>
+      <% } %>
+    </select>
+    <select name="tahun" class="input">
+      <% for (let y = tahun - 2; y <= tahun + 1; y++) { %>
+        <option value="<%= y %>" <%= y === tahun ? 'selected' : '' %>><%= y %></option>
+      <% } %>
+    </select>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+  </form>
+  <a href="/anggaran/atur?bulan=<%= bulan %>&tahun=<%= tahun %>" class="btn btn-primary">Atur Anggaran</a>
+</div>
+
+<% if (anggaranList.length > 0) { %>
+<div class="cards-row cards-row-small">
+  <div class="card">
+    <div class="card-label">Total Anggaran</div>
+    <div class="card-value">Rp <%= totalAnggaran.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Total Terpakai</div>
+    <div class="card-value text-red">Rp <%= totalTerpakai.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Sisa</div>
+    <div class="card-value <%= (totalAnggaran - totalTerpakai) >= 0 ? 'text-green' : 'text-red' %>">
+      Rp <%= (totalAnggaran - totalTerpakai).toLocaleString('id-ID') %>
+    </div>
+  </div>
+</div>
+
+<div class="anggaran-list">
+  <% anggaranList.forEach(a => { %>
+  <div class="anggaran-item">
+    <div class="anggaran-header">
+      <span class="anggaran-nama"><%= a.ikon %> <%= a.nama %></span>
+      <span class="anggaran-amounts">
+        Rp <%= a.terpakai.toLocaleString('id-ID') %> / Rp <%= a.anggaran.toLocaleString('id-ID') %>
+      </span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill <%= a.persen > 100 ? 'over-budget' : '' %>"
+        style="width: <%= Math.min(a.persen, 100) %>%"></div>
+    </div>
+    <div class="anggaran-footer">
+      <span class="<%= a.sisa >= 0 ? 'text-green' : 'text-red' %>">
+        Sisa: Rp <%= a.sisa.toLocaleString('id-ID') %>
+      </span>
+      <span class="anggaran-persen"><%= a.persen %>%</span>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<% } else { %>
+  <div class="empty-state">Belum ada anggaran untuk bulan ini. Klik "Atur Anggaran" untuk mulai.</div>
+<% } %>
+
+<%- include('../partials/footer') %>

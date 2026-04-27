@@ -1,0 +1,76 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Transaksi</h1>
+
+<div class="filter-bar">
+  <form method="GET" action="/transaksi" class="filter-form">
+    <select name="bulan" class="input">
+      <% const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; %>
+      <% for (let i = 1; i <= 12; i++) { %>
+        <option value="<%= i %>" <%= i === bulan ? 'selected' : '' %>><%= namaBulan[i-1] %></option>
+      <% } %>
+    </select>
+    <select name="tahun" class="input">
+      <% for (let y = tahun - 2; y <= tahun + 1; y++) { %>
+        <option value="<%= y %>" <%= y === tahun ? 'selected' : '' %>><%= y %></option>
+      <% } %>
+    </select>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+  </form>
+  <a href="/transaksi/tambah" class="btn btn-primary">+ Tambah</a>
+</div>
+
+<div class="cards-row cards-row-small">
+  <div class="card">
+    <div class="card-label">Pemasukan</div>
+    <div class="card-value text-green">Rp <%= totalMasuk.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Pengeluaran</div>
+    <div class="card-value text-red">Rp <%= totalKeluar.toLocaleString('id-ID') %></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Selisih</div>
+    <div class="card-value <%= (totalMasuk - totalKeluar) >= 0 ? 'text-green' : 'text-red' %>">
+      Rp <%= (totalMasuk - totalKeluar).toLocaleString('id-ID') %>
+    </div>
+  </div>
+</div>
+
+<% if (transaksi.length === 0) { %>
+  <div class="empty-state">Tidak ada transaksi di bulan ini.</div>
+<% } else { %>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Kategori</th>
+      <th>Keterangan</th>
+      <th>Tipe</th>
+      <th class="text-right">Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% transaksi.forEach(t => { %>
+    <tr>
+      <td><%= new Date(t.tanggal).toLocaleDateString('id-ID') %></td>
+      <td><%= t.ikon || '' %> <%= t.kategori_nama || '-' %></td>
+      <td><%= t.keterangan || '-' %></td>
+      <td><span class="badge badge-<%= t.tipe === 'pemasukan' ? 'green' : 'red' %>"><%= t.tipe %></span></td>
+      <td class="text-right <%= t.tipe === 'pemasukan' ? 'text-green' : 'text-red' %>">
+        Rp <%= parseFloat(t.jumlah).toLocaleString('id-ID') %>
+      </td>
+      <td class="actions">
+        <a href="/transaksi/edit/<%= t.id %>" class="btn btn-small btn-secondary">Edit</a>
+        <form method="POST" action="/transaksi/<%= t.id %>?_method=DELETE" class="inline-form" onsubmit="return confirm('Hapus transaksi ini?')">
+          <button type="submit" class="btn btn-small btn-danger">Hapus</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<% } %>
+
+<%- include('../partials/footer') %>

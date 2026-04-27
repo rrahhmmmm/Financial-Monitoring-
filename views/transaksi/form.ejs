@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title"><%= transaksi ? 'Edit Transaksi' : 'Tambah Transaksi' %></h1>
+
+<div class="form-container">
+  <form method="POST"
+    action="<%= transaksi ? '/transaksi/' + transaksi.id + '?_method=PUT' : '/transaksi' %>"
+    class="form">
+
+    <div class="form-group">
+      <label>Tanggal</label>
+      <input type="date" name="tanggal" class="input" required
+        value="<%= transaksi ? new Date(transaksi.tanggal).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>">
+    </div>
+
+    <div class="form-group">
+      <label>Tipe</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="tipe" value="pemasukan" id="tipe-masuk"
+            <%= (!transaksi || transaksi.tipe === 'pemasukan') ? 'checked' : '' %>>
+          <span class="radio-custom radio-green"></span> Pemasukan
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="tipe" value="pengeluaran" id="tipe-keluar"
+            <%= (transaksi && transaksi.tipe === 'pengeluaran') ? 'checked' : '' %>>
+          <span class="radio-custom radio-red"></span> Pengeluaran
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Kategori</label>
+      <select name="kategori_id" id="kategori-select" class="input" required>
+        <option value="">-- Pilih Kategori --</option>
+        <% kategori.forEach(k => { %>
+          <option value="<%= k.id %>" data-tipe="<%= k.tipe %>"
+            <%= (transaksi && transaksi.kategori_id === k.id) ? 'selected' : '' %>>
+            <%= k.ikon %> <%= k.nama %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Jumlah (Rp)</label>
+      <input type="number" name="jumlah" class="input" required min="0" step="100"
+        placeholder="0"
+        value="<%= transaksi ? parseFloat(transaksi.jumlah) : '' %>">
+    </div>
+
+    <div class="form-group">
+      <label>Keterangan</label>
+      <input type="text" name="keterangan" class="input"
+        placeholder="Catatan singkat..."
+        value="<%= transaksi ? transaksi.keterangan || '' : '' %>">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= transaksi ? 'Simpan Perubahan' : 'Tambah Transaksi' %></button>
+      <a href="/transaksi" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
